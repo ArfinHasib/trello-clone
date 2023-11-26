@@ -8,7 +8,7 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider     = "prisma-client-js"
 }
 
 model Board {
@@ -23,4 +23,37 @@ model Board {
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  lists         List[]
+}
+
+model List {
+  id            String  @id @default(uuid())
+  title         String
+  order         Int
+
+  boardId       String
+  board         Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  cards         Card[]
+
+  createdAt     DateTime @default(now())
+  updateAt      DateTime @updatedAt
+
+  @@index([boardId])
+}
+
+model Card {
+  id            String @id @default(uuid())
+  title         String
+  order         Int
+  description   String? @db.Text
+
+  listId        String
+  list          List @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime @default(now())
+  updateAt      DateTime @updatedAt
+
+  @@index([listId])
 }
