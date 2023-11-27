@@ -7,11 +7,16 @@ import {
    PopoverContent,
    PopoverTrigger,
 } from '@/components/ui/popover';
+
+import { useAction } from '@/hooks/use-action';
+
 import { Separator } from '@/components/ui/separator';
 import { List } from '@prisma/client';
 import { PopoverClose } from '@radix-ui/react-popover';
 
 import { MoreHorizontal, X } from 'lucide-react';
+import { deleteList } from '@/actions/delete-list';
+import { toast } from 'sonner';
 
 interface ListOptionsProps {
    data: List;
@@ -19,6 +24,15 @@ interface ListOptionsProps {
 }
 
 export const ListOptions = ({ data, onAddCard }: ListOptionsProps) => {
+   const { execute: executeDelete } = useAction(deleteList, {
+      onSuccess: (data) => {
+         toast.success(`List"${data.title}" deleted`);
+      },
+      onError: (error) => {
+         toast.error(error);
+      },
+   });
+
    return (
       <Popover>
          <PopoverTrigger asChild>
