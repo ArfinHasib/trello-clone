@@ -8,14 +8,14 @@ import { useFormStatus } from 'react-dom';
 
 interface FormTextareaProps {
    id: string;
-   label: string;
+   label?: string;
    placeholder?: string;
    required?: boolean;
    disabled?: boolean;
    errors?: Record<string, string[] | undefined>;
    clssName?: string;
    onBlur?: () => void;
-   onClick: () => void;
+   onClick?: () => void;
    onKeyDown?: KeyboardEventHandler<HTMLTextAreaElement> | undefined;
    defaultValue?: string;
 }
