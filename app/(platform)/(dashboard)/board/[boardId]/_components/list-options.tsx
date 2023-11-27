@@ -1,23 +1,22 @@
 'use client';
 
-import { FormSubmit } from '@/components/form/form-submit';
-import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { List } from '@prisma/client';
+import { ElementRef, useRef } from 'react';
+import { MoreHorizontal, X } from 'lucide-react';
+
 import {
    Popover,
    PopoverContent,
    PopoverTrigger,
+   PopoverClose,
 } from '@/components/ui/popover';
-
 import { useAction } from '@/hooks/use-action';
-
-import { Separator } from '@/components/ui/separator';
-import { List } from '@prisma/client';
-import { PopoverClose } from '@radix-ui/react-popover';
-
-import { MoreHorizontal, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { copyList } from '@/actions/copy-list';
 import { deleteList } from '@/actions/delete-list';
-import { toast } from 'sonner';
-import { ElementRef, useRef } from 'react';
+import { FormSubmit } from '@/components/form/form-submit';
+import { Separator } from '@/components/ui/separator';
 
 interface ListOptionsProps {
    data: List;
@@ -29,7 +28,17 @@ export const ListOptions = ({ data, onAddCard }: ListOptionsProps) => {
 
    const { execute: executeDelete } = useAction(deleteList, {
       onSuccess: (data) => {
-         toast.success(`List"${data.title}" deleted`);
+         toast.success(`List "${data.title}" deleted`);
+         closeRef.current?.click();
+      },
+      onError: (error) => {
+         toast.error(error);
+      },
+   });
+
+   const { execute: executeCopy } = useAction(copyList, {
+      onSuccess: (data) => {
+         toast.success(`List "${data.title}" copied`);
          closeRef.current?.click();
       },
       onError: (error) => {
@@ -44,6 +53,13 @@ export const ListOptions = ({ data, onAddCard }: ListOptionsProps) => {
       executeDelete({ id, boardId });
    };
 
+   const onCopy = (formData: FormData) => {
+      const id = formData.get('id') as string;
+      const boardId = formData.get('boardId') as string;
+
+      executeCopy({ id, boardId });
+   };
+
    return (
       <Popover>
          <PopoverTrigger asChild>
@@ -53,7 +69,7 @@ export const ListOptions = ({ data, onAddCard }: ListOptionsProps) => {
          </PopoverTrigger>
          <PopoverContent className='px-0 pt-3 pb-3' side='bottom' align='start'>
             <div className='text-sm font-medium text-center text-neutral-600 pb-4'>
-               List Actions
+               List actions
             </div>
             <PopoverClose ref={closeRef} asChild>
                <Button
@@ -68,25 +84,25 @@ export const ListOptions = ({ data, onAddCard }: ListOptionsProps) => {
                className='rounded-none w-full h-auto p-2 px-5 justify-start font-normal text-sm'
                variant='ghost'
             >
-               Add Card ...
+               Add card...
             </Button>
-            <form>
-               <input hidden name='id' value={data.id} />
+            <form action={onCopy}>
+               <input hidden name='id' id='id' value={data.id} />
                <input hidden name='boardId' id='boardId' value={data.boardId} />
                <FormSubmit
-                  className='rounded-none w-full h-auto p-2 px-5 justify-start font-normal text-sm'
                   variant='ghost'
+                  className='rounded-none w-full h-auto p-2 px-5 justify-start font-normal text-sm'
                >
-                  Copy list ...
+                  Copy list...
                </FormSubmit>
             </form>
             <Separator />
             <form action={onDelete}>
-               <input hidden name='id' value={data.id} />
+               <input hidden name='id' id='id' value={data.id} />
                <input hidden name='boardId' id='boardId' value={data.boardId} />
                <FormSubmit
-                  className='rounded-none w-full h-auto p-2 px-5 justify-start font-normal text-sm'
                   variant='ghost'
+                  className='rounded-none w-full h-auto p-2 px-5 justify-start font-normal text-sm'
                >
                   Delete this list
                </FormSubmit>
