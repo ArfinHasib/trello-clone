@@ -1,17 +1,16 @@
 'use client';
 
-import { ListWithCards } from '@/types';
+import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
-
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 
-import { ListForm } from './list-form';
-import { ListItem } from './list-item';
-
+import { ListWithCards } from '@/types';
 import { useAction } from '@/hooks/use-action';
 import { updateListOrder } from '@/actions/update-list-order';
 import { updateCardOrder } from '@/actions/update-card-order';
-import { toast } from 'sonner';
+
+import { ListForm } from './list-form';
+import { ListItem } from './list-item';
 
 interface ListContainerProps {
    data: ListWithCards[];
@@ -58,7 +57,7 @@ export const ListContainer = ({ data, boardId }: ListContainerProps) => {
          return;
       }
 
-      // if  Dopped in the same position
+      // if dropped in the same position
       if (
          destination.droppableId === source.droppableId &&
          destination.index === source.index
@@ -66,7 +65,7 @@ export const ListContainer = ({ data, boardId }: ListContainerProps) => {
          return;
       }
 
-      //  User moves a list
+      // User moves a list
       if (type === 'list') {
          const items = reorder(
             orderedData,
@@ -78,7 +77,7 @@ export const ListContainer = ({ data, boardId }: ListContainerProps) => {
          executeUpdateListOrder({ items, boardId });
       }
 
-      // user moves a card
+      // User moves a card
       if (type === 'card') {
          let newOrderedData = [...orderedData];
 
@@ -94,12 +93,12 @@ export const ListContainer = ({ data, boardId }: ListContainerProps) => {
             return;
          }
 
-         // check if cards exists on the source list
+         // Check if cards exists on the sourceList
          if (!sourceList.cards) {
             sourceList.cards = [];
          }
 
-         // check if cards exists on the destination list
+         // Check if cards exists on the destList
          if (!destList.cards) {
             destList.cards = [];
          }
@@ -120,19 +119,19 @@ export const ListContainer = ({ data, boardId }: ListContainerProps) => {
 
             setOrderedData(newOrderedData);
             executeUpdateCardOrder({
-               boardId,
+               boardId: boardId,
                items: reorderedCards,
             });
-            // user moves the card to another state
+            // User moves the card to another list
          } else {
-            // remove card frm the source list
-            const [moveCard] = sourceList.cards.splice(source.index, 1);
+            // Remove card from the source list
+            const [movedCard] = sourceList.cards.splice(source.index, 1);
 
-            // assign the new listId to the move card
-            moveCard.listId = destination.droppableId;
+            // Assign the new listId to the moved card
+            movedCard.listId = destination.droppableId;
 
             // Add card to the destination list
-            destList.cards.splice(destination.index, 0, moveCard);
+            destList.cards.splice(destination.index, 0, movedCard);
 
             sourceList.cards.forEach((card, idx) => {
                card.order = idx;
@@ -145,7 +144,7 @@ export const ListContainer = ({ data, boardId }: ListContainerProps) => {
 
             setOrderedData(newOrderedData);
             executeUpdateCardOrder({
-               boardId,
+               boardId: boardId,
                items: destList.cards,
             });
          }

@@ -1,15 +1,16 @@
 'use client';
 
-import { FormSubmit } from '@/components/form/form-submit';
-import { FormTextarea } from '@/components/form/form-textarea';
-import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { Plus, X } from 'lucide-react';
 import { forwardRef, useRef, ElementRef, KeyboardEventHandler } from 'react';
 import { useParams } from 'next/navigation';
+import { useOnClickOutside, useEventListener } from 'usehooks-ts';
+
 import { useAction } from '@/hooks/use-action';
 import { createCard } from '@/actions/create-card';
-import { useOnClickOutside, useEventListener } from 'usehooks-ts';
-import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { FormSubmit } from '@/components/form/form-submit';
+import { FormTextarea } from '@/components/form/form-textarea';
 
 interface CardFormProps {
    listId: string;
@@ -51,9 +52,9 @@ export const CardForm = forwardRef<HTMLTextAreaElement, CardFormProps>(
          }
       };
 
-      const onSubmit = (FormData: FormData) => {
-         const title = FormData.get('title') as string;
-         const listId = FormData.get('listId') as string;
+      const onSubmit = (formData: FormData) => {
+         const title = formData.get('title') as string;
+         const listId = formData.get('listId') as string;
          const boardId = params.boardId as string;
 
          execute({ title, listId, boardId });
@@ -93,7 +94,7 @@ export const CardForm = forwardRef<HTMLTextAreaElement, CardFormProps>(
                variant='ghost'
             >
                <Plus className='h-4 w-4 mr-2' />
-               Add a Card
+               Add a card
             </Button>
          </div>
       );
